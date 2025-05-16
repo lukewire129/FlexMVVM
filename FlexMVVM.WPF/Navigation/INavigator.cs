@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,13 +8,14 @@ namespace FlexMVVM.Navigation
 {
     public interface INavigator
     {
+        void SetRootLayout();
         void RootLayout();
         void Move(string url);
     }
 
     public class Navigator : INavigator
     {
-        public void RootLayout()
+        public void SetRootLayout()
         {
             Type winType = NameContainer.RegisterType["FlexFrameworkWindow"];
             Type contentType = NameContainer.RootLayout;
@@ -23,18 +25,38 @@ namespace FlexMVVM.Navigation
             if (winObject is Window window)
             {
                 window.Content = layOutObject;
+                RootLayout ();
+            }
+        }
+
+        public void RootLayout()
+        {
+            Type contentType = NameContainer.RootLayout;
+
+            var layOutObject = (UIElement)NameContainer.ServiceProvider.GetService (contentType);
+          
+            if (layOutObject is DockPanel dockPanel)
+            {
+                ContnetRemove (dockPanel);
+                bool _isGroupedWithRegion = IsGroupedWithRegion (contentType.Namespace);
+                if (_isGroupedWithRegion == false)
+                    return;
+                LayerPress (contentType);
             }
         }
 
         public void Move(string url)
         {
             string _url = url.Replace ('/', '.');
-            Type winType = NameContainer.RegisterType["FlexFrameworkWindow"];
-            var winObject = (UIElement)NameContainer.ServiceProvider.GetService (winType);
-            UIElement element = LayoutMake (_url);
-            if (winObject is Window window)
+            Type contentType = NameContainer.RootLayout;
+
+            var layOutObject = (UIElement)NameContainer.ServiceProvider.GetService (contentType);
+
+            var element = LayoutMake (_url);
+            if (layOutObject is DockPanel dockPanel)
             {
-                window.Content = element;
+                ContnetRemove (dockPanel);
+                dockPanel.Children.Add (element);
             }
         }
         private UIElement LayoutMake(string url)

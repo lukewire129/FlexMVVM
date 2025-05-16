@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 namespace FlexMVVM.WPF
@@ -32,16 +33,16 @@ namespace FlexMVVM.WPF
             this.RegisterService (this.builder.Services);
 
             Type winType = NameContainer.RegisterType["FlexFrameworkWindow"];
-
             Type contentType = NameContainer.RootLayout;
             builder.AddModules (flex.GetModules());
 
             _serviceProvider = builder.Build ();
             NameContainer.ServiceProvider = _serviceProvider;
             Shell = (DependencyObject)_serviceProvider.GetService (winType);
-            MainLayout = (DependencyObject)_serviceProvider.GetService (contentType);
 
             OnInitialized ();
+            var navi = _serviceProvider.GetService<INavigator> ();
+            navi.SetRootLayout ();
         }
 
         protected abstract void Render();
@@ -52,7 +53,6 @@ namespace FlexMVVM.WPF
         {
             if (Shell is Window window)
             {
-                window.Content = MainLayout;
                 window.Show ();
             }
         }
