@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FlexMVVM.Navigation;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -19,6 +20,7 @@ namespace FlexMVVM.WPF
         {
             this.flex = new FlexFluent ();
             this.builder = FlexApp.CreateBuilder ();
+            this.builder.Services.AddSingleton<INavigator, Navigator> ();
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -30,21 +32,12 @@ namespace FlexMVVM.WPF
             this.RegisterService (this.builder.Services);
 
             Type winType = NameContainer.RegisterType["FlexFrameworkWindow"];
-            Type contentType = NameContainer.RegisterType["FlexFrameworkRootLayout"];
+
+            Type contentType = NameContainer.RootLayout;
             builder.AddModules (flex.GetModules());
 
-            string duplicationName = null;
-            foreach(var nameContainer in NameContainer.RegisterType)
-            {
-                if(contentType == nameContainer.Value)
-                {
-                    duplicationName = nameContainer.Key;
-                }
-            }
-            NameContainer.RegisterType.Remove (duplicationName);
-
             _serviceProvider = builder.Build ();
-
+            NameContainer.ServiceProvider = _serviceProvider;
             Shell = (DependencyObject)_serviceProvider.GetService (winType);
             MainLayout = (DependencyObject)_serviceProvider.GetService (contentType);
 
@@ -84,13 +77,13 @@ namespace FlexMVVM.WPF
 
         public FlexFluent MainLayout<T>()
         {
-            NameContainer.RegisterType["FlexFrameworkRootLayout"] = typeof (T);
+            NameContainer.RootLayout = typeof (T);
             return this;
         }
 
-        public FlexFluent MainLayout<T>(Func<T> content = null)
+        public FlexFluent MainLayout<T>(Func<T> content)
         {
-            NameContainer.RegisterType["FlexFrameworkRootLayout"] = typeof (T);
+            NameContainer.RootLayout = typeof (T);
             return this;
         }
 

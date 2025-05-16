@@ -6,7 +6,7 @@ namespace FlexMVVM.WPF
     {
         public static IServiceCollection RegisterWindow<T>(this IServiceCollection services, T window, string key = null) where T : class
         {
-            string _key = key == null ? typeof (T).FullName : key;
+            string _key = typeof (T).FullName;
 
             NameContainer.RegisterType[_key] = typeof (T);
             return services;
@@ -14,15 +14,15 @@ namespace FlexMVVM.WPF
 
         public static IServiceCollection RegisterWindow<T>(this IServiceCollection services, string key = null)where T : class
         {
-            string _key = key ==null? typeof(T).FullName : key;
+            string _key = typeof (T).FullName;
 
             NameContainer.RegisterType[_key] = typeof(T);
             return services;
         }
 
-        public static IServiceCollection RegisterLayout<T>(this IServiceCollection services, string key = null) where T : class
+        public static IServiceCollection RegisterLayout<T>(this IServiceCollection services) where T : class
         {
-            string _key = key == null ? typeof (T).FullName : key;
+            string _key = typeof (T).FullName;
 
             NameContainer.RegisterType[_key] = typeof (T);
             return services;
@@ -30,7 +30,7 @@ namespace FlexMVVM.WPF
 
         public static IServiceCollection RegisterComponent<T>(this IServiceCollection services, string key = null) where T : class
         {
-            string _key = key == null ? typeof (T).FullName : key;
+            string _key = typeof (T).FullName;
 
             NameContainer.RegisterType[_key] = typeof (T);
             return services;
