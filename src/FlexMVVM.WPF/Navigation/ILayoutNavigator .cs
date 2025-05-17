@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace FlexMVVM.Navigation
 {
-    public interface INavigator
+    public interface ILayoutNavigator
     {
         void SetRootLayout();
         void RootLayout();
-        void Move(string url);
+        void NavigateTo(string url);
+        UIElement CreateLayout(string url);
     }
 
-    public class Navigator : INavigator
+    public class LayoutNavigator : ILayoutNavigator
     {
         public void SetRootLayout()
         {
@@ -37,7 +37,7 @@ namespace FlexMVVM.Navigation
           
             if (layOutObject is DockPanel dockPanel)
             {
-                ContnetRemove (dockPanel);
+                Contentemove (dockPanel);
                 bool _isGroupedWithRegion = IsGroupedWithRegion (contentType.Namespace);
                 if (_isGroupedWithRegion == false)
                     return;
@@ -45,21 +45,22 @@ namespace FlexMVVM.Navigation
             }
         }
 
-        public void Move(string url)
+        public void NavigateTo(string url)
         {
             string _url = url.Replace ('/', '.');
             Type contentType = NameContainer.RootLayout;
 
             var layOutObject = (UIElement)NameContainer.ServiceProvider.GetService (contentType);
 
-            var element = LayoutMake (_url);
+            var element = CreateLayout (_url);
             if (layOutObject is DockPanel dockPanel)
             {
-                ContnetRemove (dockPanel);
+                Contentemove (dockPanel);
                 dockPanel.Children.Add (element);
             }
         }
-        private UIElement LayoutMake(string url)
+
+        public UIElement CreateLayout(string url)
         {
             try
             {
@@ -86,13 +87,13 @@ namespace FlexMVVM.Navigation
                 for (int i = 0; i < layoutCnt; i++)
                 {
                     var parentFolderUrl = RemoveLastSegment (contentType.Namespace);
-                    rootPanel = LayoutMake ($"{parentFolderUrl}");
+                    rootPanel = CreateLayout ($"{parentFolderUrl}");
                 }
                 UIElement layOutObject = (UIElement)NameContainer.ServiceProvider.GetService (contentType);
 
                 if (rootPanel != null)
                 {
-                    ContnetRemove (rootPanel);
+                    Contentemove (rootPanel);
                     ((DockPanel)rootPanel).Children.Add (layOutObject);
 
                     return rootPanel;
@@ -144,12 +145,12 @@ namespace FlexMVVM.Navigation
             var regionObject = (UIElement)NameContainer.ServiceProvider.GetService (_region);
             if (layOutObject is DockPanel dockPanel)
             {
-                ContnetRemove (dockPanel);
+                Contentemove (dockPanel);
                 dockPanel.Children.Add(regionObject);
             }
         }
 
-        private void ContnetRemove(UIElement dockPanel) {
+        private void Contentemove(UIElement dockPanel) {
             DockPanel _dockPanel = (DockPanel)dockPanel;
             UIElement dockofRegion = null;
             foreach (UIElement child in _dockPanel.Children)

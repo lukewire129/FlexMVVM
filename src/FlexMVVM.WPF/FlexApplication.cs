@@ -14,14 +14,13 @@ namespace FlexMVVM.WPF
 
         private IServiceProvider _serviceProvider;
         private DependencyObject Shell;
-        private DependencyObject MainLayout;
         private FlexAppBuilder builder;
 
         protected FlexApplication()
         {
             this.flex = new FlexFluent ();
             this.builder = FlexApp.CreateBuilder ();
-            this.builder.Services.AddSingleton<INavigator, Navigator> ();
+            this.builder.Services.AddSingleton<ILayoutNavigator, LayoutNavigator> ();
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -41,7 +40,7 @@ namespace FlexMVVM.WPF
             Shell = (DependencyObject)_serviceProvider.GetService (winType);
 
             OnInitialized ();
-            var navi = _serviceProvider.GetService<INavigator> ();
+            var navi = _serviceProvider.GetService<ILayoutNavigator> ();
             navi.SetRootLayout ();
         }
 
